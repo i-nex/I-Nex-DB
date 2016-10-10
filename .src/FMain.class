@@ -1,0 +1,260 @@
+' Gambas class file
+
+
+Public Sub TextBox1_KeyPress()
+
+  
+
+End
+
+Public Sub Form_Open()
+  ' Dim database As New Collection
+  ' Dim rows As Integer
+  ' database = JSON.Decode(File.Load(Application.Path & "/cpudb/atom.json"))
+  ' Print database["DATABASE"].Count
+  ' database.Clear
+  ' database = JSON.Decode(File.Load(Application.Path & "/cpudb/atom2.json"))
+  ' Print database["DATABASE"].Count
+  
+  ' For rows = 0 To database["DATABASE"].Count - 1
+  '   ListView1.Add(database["DATABASE"][rows]["PROCESSOR_MODEL_NAME"], database["DATABASE"][rows]["PROCESSOR_MODEL_NAME"])
+  ' Next
+
+  ' Dim database As New Collection
+  ' Dim dat As Collection = [("DATABASE"): ""]
+  ' Dim z As Integer = 0
+  ' database = JSON.Decode(File.Load(Application.Path & "/cpudb/NULLD.json"))
+  ' 'database["DATABASE"].Add("llllllllllllll", "")
+  ' 'Print database["DATABASE"][2]["PROCESSOR_MODEL_NAME"]
+  ' dat["DATABASE"].Add("kkkkk", "qqqqqqq")
+  ' dat.Add("kkkkk", "qqqqqqqww")
+  ' dat.Add("kkkkk", "qqqqqqwmmmmmm")
+  ' database["DATABASE"].Add(dat)
+  ' database["DATABASE"].Add(dat)
+  ' File.Save(Application.Path & "/cpudb/aaaa.json", JSON.Encode(dat))
+End
+
+Public Sub Button1_Click()
+  Dim IndexPage As String
+  If TextBox1.Text Begins "https://" Then
+    IndexPage = GetFile(TextBox1.Text)
+    If Exist(Application.Path & "/IndexPage.worx") Then
+      Kill Application.Path & "/IndexPage.worx"
+    Endif
+    File.Save(Application.Path & "/IndexPage.worx", IndexPage)
+  Else If CheckBox1.Value = True Then
+    IndexPage = GetFile("https://www.techpowerup.com/cpudb/?mfgr%5B%5D=amd&mfgr%5B%5D=intel&class%5B%5D=desktop&class%5B%5D=mobile&class%5B%5D=server&released%5B%5D=y14_c&released%5B%5D=y11_14&released%5B%5D=y08_11&released%5B%5D=y05_08&released%5B%5D=y00_05&logo=&nCores=&process=&socket=&codename=&multi=&sort=name&q=")
+    If Exist(Application.Path & "/IndexPage.worx") Then
+      Kill Application.Path & "/IndexPage.worx"
+    Endif
+    File.Save(Application.Path & "/IndexPage.worx", IndexPage)
+  Else
+    TextBox1.text = "Paste URL"
+  Endif
+  
+
+End
+
+Public Sub GetFile(URL As String) As String
+
+  Dim hClient As HttpClient
+  Dim sBuffer As String
+  'Inc Application.Busy
+  hClient = New HttpClient As "hClient"
+  hClient.URL = URL
+  hClient.Async = False
+  hClient.Timeout = 10
+  hClient.Get
+
+  Print "Begin"
+  If hClient.Status < 0 Then
+    Return "ERROR"
+  Else
+    ' Success - read the data
+    Print hClient.Status
+    If Lof(hClient) Then sBuffer = Read #hClient, Lof(hClient)
+    Return sBuffer
+    hClient.Close
+  Endif
+  'Dec Application.Busy
+  Print "end"
+
+End
+
+Public Sub ConvertToURLS(IndexFile As String)
+    
+End
+
+Public Sub Button2_Click()
+  Dim IndexFile As Stream
+  Dim sLine As String
+  Dim IndexFileConverted As File
+  Print "Convert"
+  IndexFile = Open "~/IndexPage.worx"
+  IndexFileConverted = Open Application.Path & "/IndexFileConverted.worx" For Write Create
+  For Each sLine In IndexFile.Lines
+      If sLine Like "*<a href=*cpudb*" Then
+        ' Print InStr(sLine, "\"")
+        ' Print RInStr(sLine, "\"")
+        Write #IndexFileConverted, Mid$(sLine, InStr(sLine, "\"") + 1, RInStr(sLine, "\"") - InStr(sLine, "\"") - 1) & "\n"
+      Endif
+  Next
+  Close #IndexFileConverted
+  Close #IndexFile
+  Print "Converted"
+End
+
+Public Sub Button3_Click()
+  Dim IndexFileConverted As Stream
+  Dim sLine As String
+  Dim hClient As HttpClient
+  Dim sBuffer As String
+  IndexFileConverted = Open Application.Path & "/IndexFileConverted.worx"
+  
+  For Each sLine In IndexFileConverted.Lines
+  hClient = New HttpClient As "hClient"
+  hClient.URL = "https://www.techpowerup.com" & sLine
+  hClient.Async = False
+  hClient.Timeout = 10
+  hClient.Get
+
+  Print "Begin"
+  If hClient.Status < 0 Then
+    Print "ERROR"
+  Else
+    ' Success - read the data
+    Print hClient.Status
+    If Lof(hClient) Then sBuffer = Read #hClient, Lof(hClient)
+    Print sLine
+    Print InStr(sLine, "/", 10)
+    Print Mid$(sLine, InStr(sLine, "/", 10) + 1)
+    Try File.Save("" & Application.Path & "/" & Mid$(sLine, InStr(sLine, "/", 10) + 1) & ".worx", sBuffer)
+    hClient.Close
+  Endif
+
+  Next
+  
+
+End
+
+Public Sub Button4_Click()
+  Dim FilesToConvert As String
+  Dim STempFileToConvert As Stream
+  Dim Lines As String
+  Dim ipos_logo As String
+  Dim ipos_cpuname As String
+  Dim database As New Collection
+  Dim dat As Collection = [("DATABASE"): ""]
+  Dim z As Integer = 0
+  Dim tdtd As New String[]
+  Dim model_name As String
+  Dim cpu_soc_img As String
+  Try Kill Application.Path & "/cpudb/" & TextBox2.Text & ".json"
+  Copy Application.Path & "/cpudb/NULLD.json" To Application.Path & "/cpudb/" & TextBox2.Text & ".json"
+  For Each FilesToConvert In Dir(Application.Path, "*.worx")
+    If FilesToConvert Like "*" & TextBox2.Text & "*" Then
+     database = JSON.Decode(File.Load(Application.Path & "/cpudb/" & TextBox2.Text & ".json"))
+     
+     STempFileToConvert = Open Application.Path & "/" & FilesToConvert
+     
+     For Each Lines In STempFileToConvert.Lines
+       
+       If Lines Like "*cpulogo*" Then 
+         ipos_logo = Mid$(Lines, InStr(Lines, "logos/") + 6)
+         Print Replace(ipos_logo, "\" />", "")
+         'dat.Add(Replace(ipos_logo, "\" />", ""), "PROCESSOR_SOCKET_IMAGE")
+         cpu_soc_img = Replace(ipos_logo, "\" />", "")
+       Endif
+       
+       If Lines Like "*<td>*</td>*" Then
+         Print Replace(Replace(Lines, "</td>", ""), "<td>", "")
+        Try tdtd.Add(Replace(Replace(Replace(Lines, "\t", ""), "</td>", ""), "<td>", ""))
+        Try Print tdtd.Count
+         
+       Endif
+       
+       If Lines Like "*<b itemprop=\"title\">*</b>*" Then
+         ipos_cpuname = Mid$(Lines, InStr(Lines, "itemprop=\"title\">") + 9)
+         Print Replace(ipos_cpuname, "</h1>", "")
+         'dat.Add(Replace(ipos_cpuname, "</h1>", ""), "PROCESSOR_MODEL_NAME")
+         model_name = Replace(ipos_cpuname, "\"title\">", "")
+         model_name = Replace(model_name, "</b></a>", "")
+       Endif
+       ' If Lines Like "*<th>*</th>*" Then
+       '   Print Lines
+       ' Endif
+    Next
+         dat.Add(cpu_soc_img, "PROCESSOR_SOCKET_IMAGE")
+         dat.Add(tdtd[0], "PROCESSOR_SOCKET")
+         dat.Add(tdtd[1], "PROCESSOR_PROCESS_SIZE")
+         dat.Add(tdtd[2], "PROCESSOR_TRANSISTORS")
+         dat.Add(tdtd[3], "PROCESSOR_DIE_SIZE")
+         dat.Add(tdtd[4], "PROCESSOR_PACKAGE")
+         dat.Add(tdtd[5], "PROCESSOR_TCASEMAX")
+         dat.Add(tdtd[14], "PROCESSOR_RELEASED")
+         dat.Add(tdtd[12], "PROCESSOR_MARKET")
+         dat.Add(tdtd[6], "PROCESSOR_FREQUENCY")
+         dat.Add(tdtd[7], "PROCESSOR_TURBOCLOCK")
+         'dat.Add(tdtd[8], "PROCESSOR_BASECLOCK")
+         dat.Add(tdtd[9], "PROCESSOR_MULTIPLIER")
+         dat.Add(tdtd[10], "PROCESSOR_VOLTAGE")
+         dat.Add(tdtd[11], "PROCESSOR_TDP")
+         dat.Add(tdtd[15], "PROCESSOR_CODENAME")
+         dat.Add(tdtd[16], "PROCESSOR_PART")
+         dat.Add(tdtd[13], "PROCESSOR_PRODUCTION_STATUS")
+         dat.Add(model_name, "PROCESSOR_MODEL_NAME")
+         dat.Add(tdtd[17], "PROCESSOR_MEMORYSUPPORT")
+         dat.Add(tdtd[18], "PROCESSOR_OFCORES")
+         dat.Add(tdtd[19], "PROCESSOR_SMPCPUS")
+         dat.Add(tdtd[20], "PROCESSOR_INTEGRATEDGRAPHIC")
+         dat.Add(tdtd[21], "PROCESSOR_CACHEL1")
+         dat.Add(tdtd[22], "PROCESSOR_CACHEL2")
+         dat.Add(tdtd[23], "PROCESSOR_CACHEL3")
+    database["DATABASE"].Add(dat)
+    tdtd.Clear
+    File.Save(Application.Path & "/cpudb/" & TextBox2.Text & ".json", JSON.Encode(database))
+    Close #STempFileToConvert
+    database.Clear
+     
+    Endif
+     
+  Next
+  add_to_list()
+End
+
+Private Function add_to_list()
+  Dim database As New Collection
+  Dim rows As Integer
+  database = JSON.Decode(File.Load(Application.Path & "/cpudb/" & TextBox2.Text & ".json"))
+  Print database["DATABASE"].Count
+  
+  For rows = 0 To database["DATABASE"].Count - 1
+    ListView1.Add(database["DATABASE"][rows]["PROCESSOR_MODEL_NAME"], database["DATABASE"][rows]["PROCESSOR_MODEL_NAME"])
+  Next
+  
+  
+End
+
+         ' dat.Add(tdtd[0], "PROCESSOR_SOCKET")
+         ' dat.Add(tdtd[], "PROCESSOR_PROCESS_SIZE")
+         ' dat.Add(tdtd[], "PROCESSOR_TRANSISTORS")
+         ' dat.Add(tdtd[], "PROCESSOR_DIE_SIZE")
+         ' dat.Add(tdtd[], "PROCESSOR_PACKAGE")
+         ' dat.Add(tdtd[], "PROCESSOR_TCASEMAX")
+         ' dat.Add(tdtd[], "PROCESSOR_RELEASED")
+         ' dat.Add(tdtd[], "PROCESSOR_MARKET")
+         ' dat.Add(tdtd[], "PROCESSOR_FREQUENCY")
+         ' dat.Add(tdtd[], "PROCESSOR_TURBOCLOCK")
+         ' dat.Add(tdtd[], "PROCESSOR_MULTIPLIER")
+         ' dat.Add(tdtd[], "PROCESSOR_VOLTAGE")
+         ' dat.Add(tdtd[], "PROCESSOR_TDP")
+         ' dat.Add(tdtd[], "PROCESSOR_CODENAME")
+         ' dat.Add(tdtd[], "PROCESSOR_PART")
+         ' dat.Add(tdtd[], "PROCESSOR_PRODUCTION_STATUS")
+         ' dat.Add(tdtd[], "PROCESSOR_MEMORYSUPPORT")
+         ' dat.Add(tdtd[], "PROCESSOR_OFCORES")
+         ' dat.Add(tdtd[], "PROCESSOR_SMPCPUS")
+         ' dat.Add(tdtd[], "PROCESSOR_INTEGRATEDGRAPHIC")
+         ' dat.Add(tdtd[], "PROCESSOR_CACHEL1")
+         ' dat.Add(tdtd[], "PROCESSOR_CACHEL2")
+         ' dat.Add(tdtd[], "PROCESSOR_CACHEL3")

@@ -1,0 +1,35 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,117,64)
+  { TextBox1 TextBox
+    MoveScaled(2,1,115,4)
+  }
+  { Button1 Button
+    MoveScaled(1,59,16,4)
+    Text = ("GET Index")
+  }
+  { Button2 Button
+    MoveScaled(18,59,20,4)
+    Text = ("Convert Index To URL")
+  }
+  { CheckBox1 CheckBox
+    MoveScaled(2,6,24,4)
+    Text = ("Default URL")
+  }
+  { ListView1 ListView
+    MoveScaled(1,10,114,30)
+  }
+  { Button3 Button
+    MoveScaled(39,59,23,4)
+    Text = ("Download Pages")
+  }
+  { Button4 Button
+    MoveScaled(63,59,22,4)
+    Text = ("From HTML to JSON")
+  }
+  { TextBox2 TextBox
+    MoveScaled(63,54,24,4)
+    Text = ("atom")
+  }
+}
