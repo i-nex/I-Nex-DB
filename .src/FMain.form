@@ -32,4 +32,8 @@
     MoveScaled(63,54,24,4)
     Text = ("atom")
   }
+  { Button5 Button
+    MoveScaled(86,59,16,4)
+    Text = ("Download Logos")
+  }
 }
