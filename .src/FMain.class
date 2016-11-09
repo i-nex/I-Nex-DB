@@ -90,7 +90,7 @@ Public Sub Button2_Click()
   Dim sLine As String
   Dim IndexFileConverted As File
   Print "Convert"
-  IndexFile = Open "~/IndexPage.worx"
+  IndexFile = Open Application.Path & "/IndexPage.worx"
   IndexFileConverted = Open Application.Path & "/IndexFileConverted.worx" For Write Create
   For Each sLine In IndexFile.Lines
       If sLine Like "*<a href=*cpudb*" Then
@@ -235,26 +235,8 @@ Private Function add_to_list()
   
 End
 
-         ' dat.Add(tdtd[0], "PROCESSOR_SOCKET")
-         ' dat.Add(tdtd[], "PROCESSOR_PROCESS_SIZE")
-         ' dat.Add(tdtd[], "PROCESSOR_TRANSISTORS")
-         ' dat.Add(tdtd[], "PROCESSOR_DIE_SIZE")
-         ' dat.Add(tdtd[], "PROCESSOR_PACKAGE")
-         ' dat.Add(tdtd[], "PROCESSOR_TCASEMAX")
-         ' dat.Add(tdtd[], "PROCESSOR_RELEASED")
-         ' dat.Add(tdtd[], "PROCESSOR_MARKET")
-         ' dat.Add(tdtd[], "PROCESSOR_FREQUENCY")
-         ' dat.Add(tdtd[], "PROCESSOR_TURBOCLOCK")
-         ' dat.Add(tdtd[], "PROCESSOR_MULTIPLIER")
-         ' dat.Add(tdtd[], "PROCESSOR_VOLTAGE")
-         ' dat.Add(tdtd[], "PROCESSOR_TDP")
-         ' dat.Add(tdtd[], "PROCESSOR_CODENAME")
-         ' dat.Add(tdtd[], "PROCESSOR_PART")
-         ' dat.Add(tdtd[], "PROCESSOR_PRODUCTION_STATUS")
-         ' dat.Add(tdtd[], "PROCESSOR_MEMORYSUPPORT")
-         ' dat.Add(tdtd[], "PROCESSOR_OFCORES")
-         ' dat.Add(tdtd[], "PROCESSOR_SMPCPUS")
-         ' dat.Add(tdtd[], "PROCESSOR_INTEGRATEDGRAPHIC")
-         ' dat.Add(tdtd[], "PROCESSOR_CACHEL1")
-         ' dat.Add(tdtd[], "PROCESSOR_CACHEL2")
-         ' dat.Add(tdtd[], "PROCESSOR_CACHEL3")
+Public Sub Button5_Click()
+
+  
+
+End
